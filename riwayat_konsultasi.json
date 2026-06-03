@@ -47,5 +47,19 @@
     "umur": 25,
     "jenis_kelamin": "Perempuan",
     "stop_reason": "✨ Diagnosa dihentikan: Sistem telah mendeteksi 2 indikasi bahan berbahaya yang sangat kuat pada kulit Anda."
+  },
+  {
+    "tanggal": "2026-06-04 00:08",
+    "nama": "fdf",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
+  },
+  {
+    "tanggal": "2026-06-04 00:10",
+    "nama": "fdf",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
   }
 ]

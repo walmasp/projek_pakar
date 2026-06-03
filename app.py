@@ -25,7 +25,6 @@ st.set_page_config(
 info_bahan = {
     "P001": {
         "nama": "Hidroquinone",
-        "emoji": "⚗️",
         "warna": "#e74c3c",
         "kadar_max": "0,2% – 2%",
         "definisi": "Senyawa kimia yang digunakan sebagai agen pemutih kulit dengan cara menghambat produksi melanin.",
@@ -35,7 +34,6 @@ info_bahan = {
     },
     "P002": {
         "nama": "Asam Retinoat",
-        "emoji": "🧪",
         "warna": "#e67e22",
         "kadar_max": "< 0,025%",
         "definisi": "Derivat vitamin A yang digunakan untuk perawatan jerawat dan penuaan dini, namun berbahaya jika tidak diawasi medis.",
@@ -45,7 +43,6 @@ info_bahan = {
     },
     "P003": {
         "nama": "Merkuri (Mercury)",
-        "emoji": "☠️",
         "warna": "#8e44ad",
         "kadar_max": "DILARANG (0%)",
         "definisi": "Logam berat yang dilarang keras dalam produk kosmetik karena toksisitas tinggi terhadap sistem saraf dan ginjal.",
@@ -55,7 +52,6 @@ info_bahan = {
     },
     "P004": {
         "nama": "Resorcinol",
-        "emoji": "🔴",
         "warna": "#c0392b",
         "kadar_max": "< 1%",
         "definisi": "Senyawa organik yang digunakan sebagai antiseptik dan agen pengelupas kulit, namun berisiko tinggi pada dosis tidak tepat.",
@@ -65,7 +61,6 @@ info_bahan = {
     },
     "P005": {
         "nama": "Klorin (Chlorine)",
-        "emoji": "💧",
         "warna": "#27ae60",
         "kadar_max": "DILARANG dalam kosmetik",
         "definisi": "Zat kimia oksidator kuat. Keberadaannya dalam kosmetik menunjukkan produk tidak layak konsumsi.",
@@ -75,7 +70,6 @@ info_bahan = {
     },
     "P006": {
         "nama": "Arbutin",
-        "emoji": "🌿",
         "warna": "#16a085",
         "kadar_max": "0,2% – 2% (alpha arbutin)",
         "definisi": "Senyawa glikosida alami yang dapat menghambat tirosinase. Pada kadar tinggi berpotensi melepas hidroquinone.",
@@ -85,7 +79,6 @@ info_bahan = {
     },
     "P007": {
         "nama": "Kojic Acid",
-        "emoji": "🍄",
         "warna": "#d35400",
         "kadar_max": "< 1%",
         "definisi": "Asam organik hasil fermentasi jamur yang menghambat produksi melanin. Efektif namun berpotensi iritatif.",
@@ -95,7 +88,6 @@ info_bahan = {
     },
     "P008": {
         "nama": "Tretinoin",
-        "emoji": "💊",
         "warna": "#2980b9",
         "kadar_max": "Hanya dengan resep dokter",
         "definisi": "Bentuk aktif vitamin A (retinoid) yang digunakan untuk jerawat dan anti-aging. Wajib pengawasan dokter.",
@@ -105,7 +97,6 @@ info_bahan = {
     },
     "P009": {
         "nama": "Benzoyl Peroxide",
-        "emoji": "🔬",
         "warna": "#8e44ad",
         "kadar_max": "2,5% – 10%",
         "definisi": "Agen antibakteri untuk jerawat. Sangat efektif namun iritatif pada kulit sensitif atau penggunaan berlebihan.",
@@ -115,7 +106,6 @@ info_bahan = {
     },
     "P010": {
         "nama": "Arsenic (Arsen)",
-        "emoji": "☢️",
         "warna": "#7f8c8d",
         "kadar_max": "DILARANG KERAS",
         "definisi": "Metaloid beracun yang DILARANG dalam semua produk kosmetik karena bersifat karsinogenik kuat.",
@@ -125,7 +115,6 @@ info_bahan = {
     },
     "P011": {
         "nama": "AHA (Alpha Hydroxy Acid)",
-        "emoji": "🍊",
         "warna": "#f39c12",
         "kadar_max": "≤ 10% (OTC), ≤ 30% (profesional)",
         "definisi": "Asam buah (glikolat, laktat, sitrat) yang berfungsi sebagai eksfolian kimia untuk mencerahkan dan meremajakan kulit.",
@@ -135,7 +124,6 @@ info_bahan = {
     },
     "P012": {
         "nama": "Sodium Laureth Sulfate (SLS)",
-        "emoji": "🫧",
         "warna": "#1abc9c",
         "kadar_max": "Bervariasi, hindari pada kulit sensitif",
         "definisi": "Surfaktan deterjen yang digunakan dalam sabun dan shampoo. Dapat mengganggu barier kulit dan memicu iritasi.",
@@ -145,7 +133,6 @@ info_bahan = {
     },
     "P013": {
         "nama": "Steroid (Kortikosteroid)",
-        "emoji": "💉",
         "warna": "#e74c3c",
         "kadar_max": "Hanya dengan resep dokter",
         "definisi": "Hormon sintetis yang digunakan untuk menekan inflamasi. Penyalahgunaan dalam kosmetik menyebabkan steroid skin abuse.",
@@ -699,7 +686,7 @@ if halaman == "Beranda":
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🚀  Mulai Konsultasi Sekarang", use_container_width=False):
+    if st.button("Mulai Konsultasi Sekarang", use_container_width=False):
         st.session_state.halaman = "Data Pengguna"
         st.rerun()
 
@@ -856,37 +843,23 @@ elif halaman == "Konsultasi":
         st.stop()
 
    # ===================================================================
-    # LOGIKA BARU: MULTI-HIT EARLY STOPPING + SKIP DUPLIKAT
+    # LOGIKA BARU: EVALUATE ALL, STOP ASKING (Berjalan di Belakang Layar)
     # ===================================================================
-    BATAS_HIPOTESIS_TERBUKTI = 2  # Berhenti kalau sudah nemu 2 bahan berbahaya
-    
     while not st.session_state.is_done:
         current_target = st.session_state.targets[st.session_state.current_target_idx]
         gejala_target = list(rules[current_target].keys())
 
-        # 1. Jika semua gejala di hipotesis saat ini sudah selesai dievaluasi
+        # 1. Jika semua gejala di hipotesis ini sudah selesai dievaluasi
         if st.session_state.current_symptom_idx >= len(gejala_target):
-            
-            # --- HITUNG CF SEMENTARA DI BELAKANG LAYAR ---
-            cf_combine_sementara = 0.0
-            for idx, (id_gejala, cf_pakar) in enumerate(rules[current_target].items()):
-                cf_u = st.session_state.answers.get(id_gejala, 0.0)
-                cfg = float(cf_pakar) * float(cf_u)
-                if idx == 0:
-                    cf_combine_sementara = cfg
-                else:
-                    cf_combine_sementara = cf_combine_sementara + cfg * (1 - cf_combine_sementara)
-            
-            # Jika tembus 80%, hitung sebagai "Terbukti"
-            if cf_combine_sementara >= THRESHOLD:
-                st.session_state.terbukti_count += 1
-            
-            # --- CEK APAKAH SUDAH CUKUP ALASAN UNTUK BERHENTI (2 BAHAN) ---
-            if st.session_state.terbukti_count >= BATAS_HIPOTESIS_TERBUKTI:
+            st.session_state.current_target_idx += 1
+            st.session_state.current_symptom_idx = 0
+
+            # 2. Cek apakah SEMUA hipotesis (P001-P013) sudah selesai dievaluasi
+            if st.session_state.current_target_idx >= len(st.session_state.targets):
                 st.session_state.is_done = True
-                st.session_state.stop_reason = f"✨ Diagnosa dihentikan: Sistem telah mendeteksi {st.session_state.terbukti_count} indikasi bahan berbahaya yang sangat kuat pada kulit Anda."
+                st.session_state.stop_reason = "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
                 
-                # Simpan riwayat
+                # Simpan riwayat karena konsultasi benar-benar sudah mencapai akhir
                 _save_data = {
                     "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M"),
                     "nama": st.session_state.get("user_nama", "-"),
@@ -897,38 +870,18 @@ elif halaman == "Konsultasi":
                 save_riwayat(_save_data)
                 
                 st.rerun()
-                continue
-
-            # Pindah ke hipotesis berikutnya
-            st.session_state.current_target_idx += 1
-            st.session_state.current_symptom_idx = 0
-
-            # --- CEK JIKA SEMUA 13 BAHAN SUDAH HABIS DICEK ---
-            if st.session_state.current_target_idx >= len(st.session_state.targets):
-                st.session_state.is_done = True
-                
-                # Simpan riwayat
-                _save_data = {
-                    "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "nama": st.session_state.get("user_nama", "-"),
-                    "umur": st.session_state.get("user_umur", "-"),
-                    "jenis_kelamin": st.session_state.get("user_jk", "-"),
-                    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa.",
-                }
-                save_riwayat(_save_data)
-                
-                st.rerun()
             continue
 
         current_symptom = gejala_target[st.session_state.current_symptom_idx]
 
-        # 2. Lewati otomatis kalau gejala INI sudah pernah dijawab sebelumnya
+        # 3. Lewati otomatis jika gejala INI sudah pernah dijawab sebelumnya
         if current_symptom in st.session_state.answers:
             st.session_state.current_symptom_idx += 1
         else:
-            break # Berhenti muter, tampilkan pertanyaannya ke layar!
+            # Gejala baru ditemukan, hentikan loop untuk menampilkannya di layar
+            break
 
-    # Pengaman layar
+    # Perlindungan agar layar tidak error saat loop baru saja menyelesaikan konsultasi
     if st.session_state.is_done:
         st.stop()
 
@@ -992,11 +945,16 @@ elif halaman == "Konsultasi":
             skip = st.form_submit_button("⏭  Lewati", use_container_width=True)
 
         if submit or skip:
+            # 1. Simpan jawaban dari pengguna
             cf_value = cf_user_options[pilihan_user] if submit else 0.0
             st.session_state.answers[current_symptom] = cf_value
+            
+            # 2. Maju satu indeks
             st.session_state.current_symptom_idx += 1
             
-            # Kode pengecekan threshold di sini sudah kita HAPUS. Semuanya ditangani oleh loop di atas.
+            # (Early stopping dan hitung CF sementara di tombol ini telah DIHAPUS. 
+            #  Semuanya diatur otomatis dengan lancar oleh loop while di atas)
+            
             st.rerun()
 
     # Gejala yang sudah dijawab
