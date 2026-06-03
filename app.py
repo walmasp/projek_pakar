@@ -821,6 +821,7 @@ elif halaman == "Konsultasi":
         st.session_state.answers = {}
         st.session_state.is_done = False
         st.session_state.stop_reason = ""
+        st.session_state.terbukti_count = 0 
 
     st.markdown("""
     <div class="hero-banner" style="padding:1.8rem 2.5rem;">
@@ -854,7 +855,84 @@ elif halaman == "Konsultasi":
                 st.rerun()
         st.stop()
 
-    # ── TAMPILKAN PERTANYAAN ──
+   # ===================================================================
+    # LOGIKA BARU: MULTI-HIT EARLY STOPPING + SKIP DUPLIKAT
+    # ===================================================================
+    BATAS_HIPOTESIS_TERBUKTI = 2  # Berhenti kalau sudah nemu 2 bahan berbahaya
+    
+    while not st.session_state.is_done:
+        current_target = st.session_state.targets[st.session_state.current_target_idx]
+        gejala_target = list(rules[current_target].keys())
+
+        # 1. Jika semua gejala di hipotesis saat ini sudah selesai dievaluasi
+        if st.session_state.current_symptom_idx >= len(gejala_target):
+            
+            # --- HITUNG CF SEMENTARA DI BELAKANG LAYAR ---
+            cf_combine_sementara = 0.0
+            for idx, (id_gejala, cf_pakar) in enumerate(rules[current_target].items()):
+                cf_u = st.session_state.answers.get(id_gejala, 0.0)
+                cfg = float(cf_pakar) * float(cf_u)
+                if idx == 0:
+                    cf_combine_sementara = cfg
+                else:
+                    cf_combine_sementara = cf_combine_sementara + cfg * (1 - cf_combine_sementara)
+            
+            # Jika tembus 80%, hitung sebagai "Terbukti"
+            if cf_combine_sementara >= THRESHOLD:
+                st.session_state.terbukti_count += 1
+            
+            # --- CEK APAKAH SUDAH CUKUP ALASAN UNTUK BERHENTI (2 BAHAN) ---
+            if st.session_state.terbukti_count >= BATAS_HIPOTESIS_TERBUKTI:
+                st.session_state.is_done = True
+                st.session_state.stop_reason = f"✨ Diagnosa dihentikan: Sistem telah mendeteksi {st.session_state.terbukti_count} indikasi bahan berbahaya yang sangat kuat pada kulit Anda."
+                
+                # Simpan riwayat
+                _save_data = {
+                    "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "nama": st.session_state.get("user_nama", "-"),
+                    "umur": st.session_state.get("user_umur", "-"),
+                    "jenis_kelamin": st.session_state.get("user_jk", "-"),
+                    "stop_reason": st.session_state.stop_reason,
+                }
+                save_riwayat(_save_data)
+                
+                st.rerun()
+                continue
+
+            # Pindah ke hipotesis berikutnya
+            st.session_state.current_target_idx += 1
+            st.session_state.current_symptom_idx = 0
+
+            # --- CEK JIKA SEMUA 13 BAHAN SUDAH HABIS DICEK ---
+            if st.session_state.current_target_idx >= len(st.session_state.targets):
+                st.session_state.is_done = True
+                
+                # Simpan riwayat
+                _save_data = {
+                    "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "nama": st.session_state.get("user_nama", "-"),
+                    "umur": st.session_state.get("user_umur", "-"),
+                    "jenis_kelamin": st.session_state.get("user_jk", "-"),
+                    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa.",
+                }
+                save_riwayat(_save_data)
+                
+                st.rerun()
+            continue
+
+        current_symptom = gejala_target[st.session_state.current_symptom_idx]
+
+        # 2. Lewati otomatis kalau gejala INI sudah pernah dijawab sebelumnya
+        if current_symptom in st.session_state.answers:
+            st.session_state.current_symptom_idx += 1
+        else:
+            break # Berhenti muter, tampilkan pertanyaannya ke layar!
+
+    # Pengaman layar
+    if st.session_state.is_done:
+        st.stop()
+
+    # ── TAMPILKAN PERTANYAAN KE LAYAR ──
     current_target = st.session_state.targets[st.session_state.current_target_idx]
     gejala_target = list(rules[current_target].keys())
     current_symptom = gejala_target[st.session_state.current_symptom_idx]
@@ -914,44 +992,11 @@ elif halaman == "Konsultasi":
             skip = st.form_submit_button("⏭  Lewati", use_container_width=True)
 
         if submit or skip:
-            # ── LOGIKA BACKWARD CHAINING DARI pakar.py (TIDAK DIUBAH) ──
             cf_value = cf_user_options[pilihan_user] if submit else 0.0
             st.session_state.answers[current_symptom] = cf_value
             st.session_state.current_symptom_idx += 1
-
-            if st.session_state.current_symptom_idx >= len(gejala_target):
-                # Hitung CF sementara
-                cf_combine_sementara = 0.0
-                for idx, (id_gejala, cf_pakar) in enumerate(rules[current_target].items()):
-                    cf_u = st.session_state.answers.get(id_gejala, 0.0)
-                    cfg = float(cf_pakar) * float(cf_u)
-                    if idx == 0:
-                        cf_combine_sementara = cfg
-                    else:
-                        cf_combine_sementara = cf_combine_sementara + cfg * (1 - cf_combine_sementara)
-
-                # Early stopping (threshold dari pakar.py)
-                if cf_combine_sementara >= THRESHOLD:
-                    st.session_state.is_done = True
-                    st.session_state.stop_reason = f"✨ Diagnosa dihentikan lebih awal karena indikasi untuk **{hipotesis[current_target]}** sudah sangat kuat ({cf_combine_sementara*100:.2f}%)."
-                else:
-                    st.session_state.current_target_idx += 1
-                    st.session_state.current_symptom_idx = 0
-
-            if st.session_state.current_target_idx >= len(st.session_state.targets):
-                st.session_state.is_done = True
-
-            # Simpan riwayat jika selesai
-            if st.session_state.is_done:
-                _save_data = {
-                    "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "nama": st.session_state.get("user_nama", "-"),
-                    "umur": st.session_state.get("user_umur", "-"),
-                    "jenis_kelamin": st.session_state.get("user_jk", "-"),
-                    "stop_reason": st.session_state.stop_reason,
-                }
-                save_riwayat(_save_data)
-
+            
+            # Kode pengecekan threshold di sini sudah kita HAPUS. Semuanya ditangani oleh loop di atas.
             st.rerun()
 
     # Gejala yang sudah dijawab

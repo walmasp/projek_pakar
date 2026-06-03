@@ -175,53 +175,61 @@ if st.session_state.is_done:
 
 # Jika belum selesai, lanjutkan pertanyaan
 else:
-    current_target = st.session_state.targets[st.session_state.current_target_idx]
-    gejala_target = list(rules[current_target].keys())
-    current_symptom = gejala_target[st.session_state.current_symptom_idx]
-    
-    st.progress((st.session_state.current_target_idx) / len(st.session_state.targets))
-    st.caption(f"Menguji Hipotesis: {hipotesis[current_target]} ({st.session_state.current_target_idx + 1}/{len(st.session_state.targets)})")
-    
-    with st.container():
-        st.subheader("Pertanyaan:")
-        st.info(f"**{gejala_dict[current_symptom]}**")
+    # --- BLOK LOGIKA BARU: EVALUATE ALL, STOP ASKING ---
+    # Perulangan ini berjalan di belakang layar untuk otomatis melompati
+    # gejala duplikat dan berpindah antar hipotesis tanpa perlu me-reload UI.
+    while not st.session_state.is_done:
+        current_target = st.session_state.targets[st.session_state.current_target_idx]
+        gejala_target = list(rules[current_target].keys())
         
-        with st.form(key="form_jawaban"):
-            pilihan_user = st.radio("Seberapa yakin Anda mengalami hal ini?", list(cf_user_options.keys()))
-            submit_button = st.form_submit_button(label="Jawab & Lanjut")
+        # 1. Jika semua gejala pada hipotesis saat ini sudah dicek
+        if st.session_state.current_symptom_idx >= len(gejala_target):
+            # Pindah ke hipotesis selanjutnya
+            st.session_state.current_target_idx += 1
+            st.session_state.current_symptom_idx = 0 
             
-            if submit_button:
-                # 1. Simpan jawaban user
-                st.session_state.answers[current_symptom] = cf_user_options[pilihan_user]
+            # Cek jika SEMUA hipotesis sudah dievaluasi
+            if st.session_state.current_target_idx >= len(st.session_state.targets):
+                st.session_state.is_done = True
+                st.rerun() # Refresh layar agar masuk ke blok Hasil Diagnosa
+            continue # Lanjut ke iterasi while berikutnya untuk cek hipotesis baru
+        
+        current_symptom = gejala_target[st.session_state.current_symptom_idx]
+        
+        # 2. Cek apakah gejala INI sudah pernah dijawab pada hipotesis sebelumnya
+        if current_symptom in st.session_state.answers:
+            # Otomatis lewati pertanyaan ini dengan memakai jawaban lama
+            st.session_state.current_symptom_idx += 1
+        else:
+            # Ketemu gejala baru yang belum dijawab! Hentikan loop untuk ditanyakan.
+            break 
+
+    # --- BLOK UI STREAMLIT (TETAP DIPERTAHANKAN) ---
+    # Jika setelah filter duplikat di atas sistem belum selesai, maka tampilkan UI form
+    if not st.session_state.is_done:
+        current_target = st.session_state.targets[st.session_state.current_target_idx]
+        gejala_target = list(rules[current_target].keys())
+        current_symptom = gejala_target[st.session_state.current_symptom_idx]
+        
+        st.progress((st.session_state.current_target_idx) / len(st.session_state.targets))
+        st.caption(f"Menguji Hipotesis: {hipotesis[current_target]} ({st.session_state.current_target_idx + 1}/{len(st.session_state.targets)})")
+        
+        with st.container():
+            st.subheader("Pertanyaan:")
+            st.info(f"**{gejala_dict[current_symptom]}**")
+            
+            with st.form(key="form_jawaban"):
+                pilihan_user = st.radio("Seberapa yakin Anda mengalami hal ini?", list(cf_user_options.keys()))
+                submit_button = st.form_submit_button(label="Jawab & Lanjut")
                 
-                # 2. Pindah ke gejala selanjutnya
-                st.session_state.current_symptom_idx += 1
-                
-                # 3. Cek apakah gejala untuk target INI sudah habis dijawab semua
-                if st.session_state.current_symptom_idx >= len(gejala_target):
+                if submit_button:
+                    # 1. Simpan jawaban user ke dalam dictionary answers
+                    st.session_state.answers[current_symptom] = cf_user_options[pilihan_user]
                     
-                    # LOGIKA BARU: Hitung CF sementaranya di sini
-                    cf_combine_sementara = 0.0
-                    for idx, (id_gejala, cf_pakar) in enumerate(rules[current_target].items()):
-                        cf_u = st.session_state.answers.get(id_gejala, 0.0)
-                        cfg = float(cf_pakar) * float(cf_u)
-                        if idx == 0:
-                            cf_combine_sementara = cfg
-                        else:
-                            cf_combine_sementara = cf_combine_sementara + cfg * (1 - cf_combine_sementara)
+                    # 2. Pindah ke indeks gejala selanjutnya (maju 1 langkah)
+                    st.session_state.current_symptom_idx += 1
                     
-                    # LOGIKA BARU: Cek Early Stopping
-                    if cf_combine_sementara >= THRESHOLD:
-                        # Jika nilainya >= 80%, hentikan pencarian!
-                        st.session_state.is_done = True
-                        st.session_state.stop_reason = f"✨ Diagnosa dihentikan lebih awal karena indikasi untuk **{hipotesis[current_target]}** sudah sangat kuat ({cf_combine_sementara*100:.2f}%)."
-                    else:
-                        # Jika di bawah 80%, ganti Target Hipotesis
-                        st.session_state.current_target_idx += 1
-                        st.session_state.current_symptom_idx = 0 
-                
-                # 4. Jika semua hipotesis sudah diuji dan tidak ada yang tembus threshold
-                if st.session_state.current_target_idx >= len(st.session_state.targets):
-                    st.session_state.is_done = True
-                
-                st.rerun()
+                    # [EARLY STOPPING DIHAPUS. PENGECEKAN PINDAH TARGET KINI 
+                    # DITANGANI OLEH LOOP WHILE DI ATAS SECARA OTOMATIS]
+                    
+                    st.rerun()

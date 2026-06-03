@@ -1,0 +1,51 @@
+[
+  {
+    "tanggal": "2026-06-03 21:19",
+    "nama": "Najib",
+    "umur": 40,
+    "jenis_kelamin": "Laki-laki",
+    "stop_reason": "✨ Diagnosa dihentikan lebih awal karena indikasi untuk **Hidroquinone** sudah sangat kuat (85.44%)."
+  },
+  {
+    "tanggal": "2026-06-03 21:39",
+    "nama": "cece",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": ""
+  },
+  {
+    "tanggal": "2026-06-03 21:43",
+    "nama": "cece",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": ""
+  },
+  {
+    "tanggal": "2026-06-03 22:56",
+    "nama": "plis",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "✨ Diagnosa dihentikan lebih awal karena indikasi untuk **Hidroquinone** sudah sangat kuat (96.44%)."
+  },
+  {
+    "tanggal": "2026-06-03 23:18",
+    "nama": "plis",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
+  },
+  {
+    "tanggal": "2026-06-03 23:20",
+    "nama": "plis",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
+  },
+  {
+    "tanggal": "2026-06-03 23:27",
+    "nama": "plis",
+    "umur": 25,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "✨ Diagnosa dihentikan: Sistem telah mendeteksi 2 indikasi bahan berbahaya yang sangat kuat pada kulit Anda."
+  }
+]
