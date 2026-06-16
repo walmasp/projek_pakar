@@ -1251,7 +1251,7 @@ elif halaman == "Info Bahan":
         kadar_color = "#e74c3c" if is_dilarang else "#f39c12" if is_resep else "#27ae60"
         kadar_bg = "#fff5f5" if is_dilarang else "#fffbf0" if is_resep else "#f0faf5"
 
-        with st.expander(f"{info['emoji']}  **{nama}** ({kode})  •  {info['kadar_max']}"):
+        with st.expander(f"**{nama}** ({kode})  •  {info['kadar_max']}"):
             col_info1, col_info2 = st.columns([3, 2])
             with col_info1:
                 st.markdown(f"**Definisi:** {info['definisi']}")

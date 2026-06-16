@@ -61,5 +61,12 @@
     "umur": 25,
     "jenis_kelamin": "Perempuan",
     "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
+  },
+  {
+    "tanggal": "2026-06-04 07:55",
+    "nama": "Celsi",
+    "umur": 26,
+    "jenis_kelamin": "Perempuan",
+    "stop_reason": "Evaluasi selesai: Seluruh hipotesis telah diperiksa."
   }
 ]
