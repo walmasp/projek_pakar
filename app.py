@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="DermaScan — Deteksi Bahan Kosmetik Berbahaya",
     page_icon="🔬",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded" if st.session_state.get("logged_in") else "collapsed",
 )
 
 # ══════════════════════════════════════════════════════════════════
@@ -513,6 +513,127 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
+# AUTENTIKASI — GERBANG LOGIN
+# ══════════════════════════════════════════════════════════════════
+AUTH_USERNAME = "Alma"
+AUTH_PASSWORD = "123230101"
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    # CSS khusus halaman login — memakai token warna & font yang sama
+    # dengan hero-banner & ds-card pada halaman lain (tidak menyentuh
+    # style yang sudah didefinisikan di atas).
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="collapsedControl"] { display: none !important; }
+
+    .login-brand {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        border-radius: 20px 20px 0 0;
+        padding: 2.4rem 2rem 1.8rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,32,39,0.3);
+    }
+    .login-brand::before {
+        content: '';
+        position: absolute;
+        top: -60%;
+        right: -20%;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(100,216,203,0.25) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .login-icon { font-size: 2.6rem; margin-bottom: 0.4rem; position: relative; z-index: 1; }
+    .login-brand h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 2rem;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.5px;
+        position: relative;
+        z-index: 1;
+    }
+    .login-brand p {
+        font-size: 0.74rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        opacity: 0.78;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    .login-body {
+        background: white;
+        border-radius: 0 0 20px 20px;
+        padding: 1.7rem 2.2rem 0.6rem;
+        box-shadow: 0 10px 40px rgba(15,32,39,0.12);
+        margin-bottom: 1.2rem;
+    }
+    .login-divider {
+        text-align: center;
+        color: #95a5a6;
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 1.1rem;
+    }
+    .login-foot-note {
+        text-align: center;
+        font-size: 0.76rem;
+        color: #95a5a6;
+        margin-top: 0.3rem;
+        line-height: 1.7;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div style='height:5vh'></div>", unsafe_allow_html=True)
+    col_login_l, col_login_c, col_login_r = st.columns([1, 1.3, 1])
+    with col_login_c:
+        st.markdown("""
+        <div class="login-brand">
+            <div class="login-icon">🔬</div>
+            <h1>DermaScan</h1>
+            <p>Expert System &nbsp;·&nbsp; Masuk untuk Melanjutkan</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown('<div class="login-body">', unsafe_allow_html=True)
+        st.markdown('<div class="login-divider">Silakan masuk dengan akun Anda</div>', unsafe_allow_html=True)
+
+        with st.form("form_login_dermascan"):
+            login_username = st.text_input("Username", placeholder="Masukkan username")
+            login_password = st.text_input("Password", type="password", placeholder="Masukkan password")
+            login_submit = st.form_submit_button("🔐  Masuk", use_container_width=True)
+
+            if login_submit:
+                if not login_username.strip() or not login_password.strip():
+                    st.error("❌ Username dan password wajib diisi!")
+                elif login_username == AUTH_USERNAME and login_password == AUTH_PASSWORD:
+                    st.session_state.logged_in = True
+                    st.rerun()
+                else:
+                    st.error("❌ Username atau password salah. Silakan coba lagi.")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="login-foot-note">
+            🔒 Akses terbatas untuk pengguna terverifikasi<br>
+            Backward Chaining + Certainty Factor — Jurnal FORISTEK Vol.13 No.1
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.stop()
+
+# ══════════════════════════════════════════════════════════════════
 # SIDEBAR NAVIGASI
 # ══════════════════════════════════════════════════════════════════
 RIWAYAT_FILE = "riwayat_konsultasi.json"
@@ -577,6 +698,11 @@ with st.sidebar:
             ✅ Diagnosa Selesai
         </div>
         """, unsafe_allow_html=True)
+
+    st.markdown("<hr style='border-color:rgba(255,255,255,0.1); margin:1rem 0 0.6rem;'>", unsafe_allow_html=True)
+    if st.button("🚪  Keluar", key="btn_logout", use_container_width=True):
+        st.session_state.logged_in = False
+        st.rerun()
 
     st.markdown("""
     <div style="color:#4a6878; font-size:0.72rem; text-align:center; margin-top:2rem; line-height:1.6;">
