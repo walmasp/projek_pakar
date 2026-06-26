@@ -1,32 +1,29 @@
-# DermaScan — Sistem Pakar Efek Samping Kosmetik
+Nama Kelompok : Kelompok 6
+Anggota :
 
-## Struktur Folder
+Cendikia Permata Dewanti (123230011)
 
-```
-project/
-├── app.py              ← Aplikasi Streamlit utama (FILE INI)
-├── pakar.py            ← Logika backward chaining (FILE ANDA, JANGAN DIUBAH)
-├── requirements.txt    ← Dependensi Python
-└── riwayat_konsultasi.json  ← Dibuat otomatis saat konsultasi pertama
-```
+Celsi Fransisca Sitompul (123230015)
 
-## Langkah Instalasi & Menjalankan
+Alma Wulan Saptaningrum (123230101)
 
-1. Pastikan Python 3.9+ terinstal di komputer Anda.
+Judul Aplikasi : DermaScan: Sistem Pakar Deteksi Efek Samping Bahan Kosmetik Berbahaya
+Menggunakan Metode Backward Chaining dan Certainty Factor
+Metode : Backward Chaining dan Certainty Factor
+Bahasa Pemrograman : Python
+Framework : Streamlit
+Database : JSON
+Username Login : Alma
+Password Login : 123230101
+Cara Menjalankan Program :
 
-2. Letakkan `app.py`, `pakar.py`, dan `requirements.txt` dalam satu folder yang sama.
+Pastikan Python sudah terinstall pada komputer atau laptop.
 
-3. Install dependensi:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Buka terminal atau command prompt, lalu arahkan ke dalam folder direktori proyek.
 
-4. Jalankan aplikasi:
-   ```bash
-   streamlit run app.py
-   ```
+Install seluruh library yang dibutuhkan dengan menjalankan perintah pip install -r requirements.txt.
 
-5. Browser akan terbuka otomatis di `http://localhost:8501`
+Jalankan aplikasi dengan menggunakan perintah streamlit run app.py.
 
 ## Fitur Halaman
 
