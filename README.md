@@ -39,7 +39,7 @@ Jalankan aplikasi dengan menggunakan perintah streamlit run app.py.
 
 ## Catatan Teknis
 
-- **Semua logika inferensi** (backward chaining, CF, early stopping, threshold 80%)
+- **Semua logika inferensi** (backward chaining, CF, dll)
   berasal **100% dari `pakar.py`** tanpa modifikasi apapun.
 - `app.py` hanya mengimpor `hipotesis`, `gejala_dict`, `rules`, `cf_user_options`, dan `THRESHOLD`
   dari `pakar.py`.
